@@ -1,5 +1,7 @@
+// frontend/src/components/modals/DonationModal.tsx
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext'; // Import useToast untuk notifikasi yang lebih baik
 
 interface Donation {
   _id: string;
@@ -25,40 +27,52 @@ interface DonationModalProps {
 }
 
 const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose, onSubmit, donation, users, mode }) => {
-  const [formData, setFormData] = useState({
-    user_id: '',
-    amount: '',
-    payment_method: 'Transfer bank',
-    donation_status: 'Pending',
-    note: '',
-  });
+  const { addToast } = useToast(); // Inisialisasi useToast
 
-  useEffect(() => {
+  const getInitialFormData = () => {
     if (donation && (mode === 'edit' || mode === 'view')) {
-      setFormData({
+      return {
         user_id: donation.user_id._id,
         amount: donation.amount.toString(),
         payment_method: donation.payment_method,
         donation_status: donation.donation_status,
         note: donation.note || '',
-      });
+      };
     } else {
-      setFormData({
-        user_id: '',
+      return {
+        user_id: users.length > 0 ? users[0]._id : '', // Set user_id ke ID user pertama sebagai default
         amount: '',
         payment_method: 'Transfer bank',
         donation_status: 'Pending',
         note: '',
-      });
+      };
     }
-  }, [donation, mode]);
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData);
+
+  useEffect(() => {
+    // Gunakan fungsi untuk mendapatkan nilai awal agar state hanya diinisialisasi sekali
+    setFormData(getInitialFormData());
+  }, [donation, mode, users]); // Tambahkan users ke dependency array agar re-evaluate jika daftar user berubah
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mode !== 'view') {
+      // Client-side validation
+      if (!formData.user_id) {
+        addToast('Please select a donor.', 'error');
+        return;
+      }
+      const amountValue = parseFloat(formData.amount);
+      if (isNaN(amountValue) || amountValue <= 0) {
+        addToast('Amount must be a positive number.', 'error');
+        return;
+      }
+
       onSubmit({
         ...formData,
-        amount: parseFloat(formData.amount),
+        amount: amountValue, // Pastikan amount adalah number saat dikirim
       });
     }
   };
@@ -105,7 +119,7 @@ const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose, onSubmit
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                 >
-                  <option value="">Select a donor</option>
+                  <option value="">Select a donor</option> {/* Tetap ada, tapi validasi akan menangkap jika ini dipilih */}
                   {users.map((user) => (
                     <option key={user._id} value={user._id}>
                       {user.name} ({user.email})

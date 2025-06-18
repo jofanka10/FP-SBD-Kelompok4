@@ -2,17 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/db');
-
-// Import routes
-const userRoutes = require('./routes/userRoutes');
-const donationRoutes = require('./routes/donationRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
-const aidRecipientRoutes = require('./routes/aidRecipientRoutes');
-const aidRoutes = require('./routes/aidRoutes');
-const aidCategoryRoutes = require('./routes/aidCategoryRoutes');
-const trashRoutes = require('./routes/trashRoutes');
-const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/donasiplus';
+const connectDB = require('./config/db'); // Asumsi Anda memiliki file connectDB
 
 const app = express();
 
@@ -21,23 +11,32 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-connectDB();
+connectDB(); // Panggil fungsi koneksi database Anda
 
-// Routes
+// Import routes
+const userRoutes = require('./routes/userRoutes');
+const donationRoutes = require('./routes/donationRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const aidRecipientRoutes = require('./routes/aidRecipientRoutes');
+const aidRoutes = require('./routes/aidRoutes');
+const aidCategoryRoutes = require('./routes/aidCategoryRoutes');
+const trashRoutes = require('./routes/TrashRoutes'); // Pastikan nama file ini benar (TrashRoutes.js)
+
+// Use Routes - Pastikan semua rute diawali dengan '/api'
 app.use('/api/users', userRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/aid-recipients', aidRecipientRoutes);
-app.use('/api/aid', aidRoutes);
+app.use('/api/aids', aidRoutes);
 app.use('/api/aid-categories', aidCategoryRoutes);
-app.use('/api/trash', trashRoutes);
+app.use('/api/trash', trashRoutes); // Ini sangat penting dan sudah benar!
 
 // Root test route
 app.get('/', (req, res) => {
   res.send('🚀 Backend server is running');
 });
 
-// 404 fallback
+// 404 fallback (catch-all for undefined routes)
 app.use('*', (req, res) => {
   res.status(404).json({ message: '❌ Route not found' });
 });

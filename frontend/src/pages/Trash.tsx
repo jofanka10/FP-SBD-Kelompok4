@@ -1,14 +1,15 @@
+// frontend/src/pages/Trash.tsx
 import React, { useState, useEffect } from 'react';
 import { RotateCcw, Trash2, Search } from 'lucide-react';
-import { trashAPI } from '../services/api';
-import { useToast } from '../contexts/ToastContext';
+import { trashAPI } from '../services/api'; // Pastikan path ini benar
+import { useToast } from '../contexts/ToastContext'; // Pastikan path ini benar
 
 interface TrashItem {
   _id: string;
-  collection: string;
+  collection?: string; // Buat opsional karena beberapa item tidak punya
   documentId: string;
   deletedAt: string;
-  originalData: any;
+  originalData?: any; // Buat opsional karena beberapa item tidak punya
 }
 
 const Trash: React.FC = () => {
@@ -23,41 +24,56 @@ const Trash: React.FC = () => {
 
   const fetchTrashItems = async () => {
     try {
-      const response = await trashAPI.getAll();
+      setLoading(true); // Pastikan loading true setiap kali fetching
+      const response = await trashAPI.getAll(); // Memanggil trashAPI.getAll()
       setTrashItems(response.data);
     } catch (error) {
+      console.error("Error fetching trash items:", error);
       addToast('Error fetching trash items', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRestore = async (collection: string, documentId: string) => {
+  const handleRestore = async (collection: string | undefined, documentId: string) => {
+    if (!collection) {
+      addToast('Cannot restore: Collection type is missing.', 'error');
+      return;
+    }
     if (window.confirm('Are you sure you want to restore this item?')) {
       try {
+        // Memanggil trashAPI.restore() dengan collection dan documentId
         await trashAPI.restore(collection, documentId);
         addToast('Item restored successfully', 'success');
         fetchTrashItems();
       } catch (error) {
+        console.error("Error restoring item:", error);
         addToast('Error restoring item', 'error');
       }
     }
   };
 
-  const handlePermanentDelete = async (collection: string, documentId: string) => {
+  const handlePermanentDelete = async (collection: string | undefined, documentId: string) => {
+    if (!collection) {
+      addToast('Cannot delete: Collection type is missing.', 'error');
+      return;
+    }
     if (window.confirm('Are you sure you want to permanently delete this item? This action cannot be undone.')) {
       try {
+        // Memanggil trashAPI.permanentDelete() dengan collection dan documentId
         await trashAPI.permanentDelete(collection, documentId);
         addToast('Item permanently deleted', 'success');
         fetchTrashItems();
       } catch (error) {
+        console.error("Error permanently deleting item:", error);
         addToast('Error permanently deleting item', 'error');
       }
     }
   };
 
   const getDisplayName = (item: TrashItem) => {
-    const data = item.originalData;
+    const data = item.originalData || {};
+
     switch (item.collection) {
       case 'User':
         return data.name || data.email || 'Unknown User';
@@ -72,11 +88,11 @@ const Trash: React.FC = () => {
       case 'AidCategory':
         return data.category_name || 'Unknown Category';
       default:
-        return `${item.collection} Item`;
+        return `Unknown Collection Item (ID: ${item.documentId})`;
     }
   };
 
-  const getCollectionBadgeColor = (collection: string) => {
+  const getCollectionBadgeColor = (collection: string | undefined) => {
     switch (collection) {
       case 'User':
         return 'bg-blue-100 text-blue-800';
@@ -95,10 +111,13 @@ const Trash: React.FC = () => {
     }
   };
 
-  const filteredTrashItems = trashItems.filter((item) =>
-    getDisplayName(item).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.collection.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTrashItems = trashItems.filter((item) => {
+    const displayName = getDisplayName(item).toLowerCase();
+    const collectionName = item.collection?.toLowerCase() || '';
+    const searchLower = searchTerm.toLowerCase();
+
+    return displayName.includes(searchLower) || collectionName.includes(searchLower);
+  });
 
   if (loading) {
     return (
@@ -161,7 +180,7 @@ const Trash: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCollectionBadgeColor(item.collection)}`}>
-                      {item.collection}
+                      {item.collection || 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

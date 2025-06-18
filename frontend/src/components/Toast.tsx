@@ -1,3 +1,5 @@
+// src/components/Toast.tsx (TIDAK PERLU PERUBAHAN)
+
 import React from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
@@ -41,7 +43,7 @@ const Toast: React.FC = () => {
     <div className="fixed top-4 right-4 z-50 space-y-2">
       {toasts.map((toast) => (
         <div
-          key={toast.id}
+          key={toast.id} // Ini sudah benar, karena id sekarang akan unik
           className={`max-w-sm w-full ${getBackgroundColor(toast.type)} border rounded-lg shadow-lg p-4 animate-in slide-in-from-right duration-300`}
         >
           <div className="flex items-start">

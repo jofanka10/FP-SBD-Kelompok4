@@ -1,14 +1,13 @@
+// frontend/src/components/modals/TransactionModal.tsx
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext'; // Asumsikan Anda menggunakan ToastContext
 
 interface Transaction {
   _id: string;
   donation: {
     _id: string;
-    user_id: {
-      name: string;
-      email: string;
-    };
+    user_id: { name: string; email: string; };
     amount: number;
   };
   payment_amount: number;
@@ -27,37 +26,51 @@ interface TransactionModalProps {
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, onSubmit, transaction, donations, mode }) => {
-  const [formData, setFormData] = useState({
-    donation: '',
-    payment_amount: '',
-    payment_method: 'Transfer bank',
-    transaction_status: 'Pending',
-  });
+  const { addToast } = useToast(); // Inisialisasi useToast
 
-  useEffect(() => {
+  const getInitialFormData = () => {
     if (transaction && (mode === 'edit' || mode === 'view')) {
-      setFormData({
+      return {
         donation: transaction.donation._id,
         payment_amount: transaction.payment_amount.toString(),
         payment_method: transaction.payment_method,
         transaction_status: transaction.transaction_status,
-      });
+      };
     } else {
-      setFormData({
-        donation: '',
+      return {
+        // Atur 'donation' ke ID donasi pertama sebagai default jika ada,
+        // jika tidak, biarkan kosong agar validasi frontend menangkapnya.
+        donation: donations.length > 0 ? donations[0]._id : '',
         payment_amount: '',
         payment_method: 'Transfer bank',
         transaction_status: 'Pending',
-      });
+      };
     }
-  }, [transaction, mode]);
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData);
+
+  useEffect(() => {
+    setFormData(getInitialFormData());
+  }, [transaction, mode, donations]); // Tambahkan 'donations' ke dependency array
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mode !== 'view') {
+      // Client-side validation
+      if (!formData.donation) {
+        addToast('Please select a donation.', 'error');
+        return;
+      }
+      const paymentAmountValue = parseFloat(formData.payment_amount);
+      if (isNaN(paymentAmountValue) || paymentAmountValue <= 0) {
+        addToast('Payment amount must be a positive number.', 'error');
+        return;
+      }
+
       onSubmit({
         ...formData,
-        payment_amount: parseFloat(formData.payment_amount),
+        payment_amount: paymentAmountValue, // Pastikan payment_amount adalah number
       });
     }
   };
@@ -83,10 +96,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100" >
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -104,7 +114,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                 >
-                  <option value="">Select a donation</option>
+                  <option value="">Select a donation</option> {/* Biarkan ini, validasi frontend akan menangani */}
                   {donations.map((donation) => (
                     <option key={donation._id} value={donation._id}>
                       {donation.user_id?.name} - Rp {donation.amount.toLocaleString('id-ID')}

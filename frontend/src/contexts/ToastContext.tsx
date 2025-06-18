@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/ToastContext.tsx
+import React, { createContext, useContext, useState, useCallback } from 'react';
+// import { v4 as uuidv4 } from 'uuid'; // Hapus baris ini
+import { v4 } from 'uuid'; // <--- Ubah import menjadi ini, atau bisa juga 'import * as uuid from "uuid";'
 
 interface Toast {
   id: string;
@@ -25,19 +28,21 @@ export const useToast = () => {
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = (message: string, type: Toast['type']) => {
-    const id = Date.now().toString();
+  const addToast = useCallback((message: string, type: Toast['type']) => {
+    const id = v4(); // <--- Gunakan v4() langsung
+    // Jika Anda menggunakan 'import * as uuid from "uuid";'
+    // maka Anda akan menulis: const id = uuid.v4();
     setToasts(prev => [...prev, { id, message, type }]);
     
     // Auto remove after 5 seconds
     setTimeout(() => {
-      removeToast(id);
+      setToasts(prev => prev.filter(toast => toast.id !== id));
     }, 5000);
-  };
+  }, []);
 
-  const removeToast = (id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
+  }, []);
 
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>

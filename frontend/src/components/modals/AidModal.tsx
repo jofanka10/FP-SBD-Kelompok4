@@ -29,7 +29,7 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
     aid_type: 'Uang tunai',
     aid_description: '',
     available_amount: '',
-    aid_category: '',
+    aid_category: '', // Ini akan kosong saat inisialisasi untuk create mode
   });
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
         aid_type: aid.aid_type,
         aid_description: aid.aid_description,
         available_amount: aid.available_amount.toString(),
-        aid_category: aid.aid_category?._id || '',
+        aid_category: aid.aid_category?._id || '', // Pastikan _id atau string kosong
       });
     } else {
       setFormData({
@@ -47,7 +47,7 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
         aid_type: 'Uang tunai',
         aid_description: '',
         available_amount: '',
-        aid_category: '',
+        aid_category: '', // Pastikan ini juga diinisialisasi kosong untuk create
       });
     }
   }, [aid, mode]);
@@ -55,9 +55,21 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mode !== 'view') {
+      // ************ VALIDASI KRITIS DI SINI ************
+      if (!formData.aid_category) {
+        alert('Please select an Aid Category!'); // Anda bisa ganti ini dengan toast/notifikasi yang lebih baik
+        return; // Hentikan fungsi jika validasi gagal
+      }
+      // *************************************************
+
       onSubmit({
         ...formData,
         available_amount: parseFloat(formData.available_amount),
+        // Pastikan aid_category dikirim sebagai string _id atau null
+        // Jika backend Anda required:true, maka aid_category harus selalu ada.
+        // Jika Anda ingin mengirim null saat kosong, tambahkan:
+        // aid_category: formData.aid_category === '' ? null : formData.aid_category,
+        // Tapi karena backend Anda required:true, maka validasi di atas sudah cukup.
       });
     }
   };
@@ -134,6 +146,7 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
                   value={formData.aid_category}
                   onChange={handleChange}
                   disabled={isReadOnly}
+                  required // <--- TAMBAHKAN INI UNTUK VALIDASI HTML5
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                 >
                   <option value="">Select a category</option>
@@ -182,7 +195,7 @@ const AidModal: React.FC<AidModalProps> = ({ isOpen, onClose, onSubmit, aid, cat
             <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <button
                 type="submit"
-                onClick={handleSubmit}
+                onClick={handleSubmit} // Pastikan ini memanggil handleSubmit form
                 className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
               >
                 {mode === 'create' ? 'Create' : 'Save Changes'}

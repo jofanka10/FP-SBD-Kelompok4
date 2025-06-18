@@ -8,7 +8,8 @@ if (!API_BASE_URL) {
 }
 
 const API = axios.create({
-  baseURL: `${API_BASE_URL}/api`, // Pastikan ini ada dan tidak ada typo
+  // baseURL akan menjadi "http://localhost:5001/api"
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -64,7 +65,9 @@ export const aidAPI = {
 
 // Deklarasi trashAPI yang benar dan menggunakan Axios
 export const trashAPI = {
-  getDeletedItems: () => API.get('/trash'), // Untuk mendapatkan semua item di trash
-  restoreItem: (id: string) => API.put(`/trash/restore/${id}`), // Menggunakan PUT untuk restore
-  permanentDelete: (id: string) => API.delete(`/trash/permanent-delete/${id}`), // Menggunakan DELETE untuk hapus permanen
+  getAll: () => API.get('/trash'), // Untuk mendapatkan semua item di trash
+  // Fungsi restore dan permanentDelete di Trash.tsx menerima (collection, documentId)
+  // URL ini sekarang cocok dengan rute backend yang diperbarui
+  restore: (collection: string, documentId: string) => API.put(`/trash/restore/${collection}/${documentId}`),
+  permanentDelete: (collection: string, documentId: string) => API.delete(`/trash/permanent-delete/${collection}/${documentId}`),
 };
