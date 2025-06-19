@@ -1,5 +1,3 @@
-// src/components/Toast.tsx (TIDAK PERLU PERUBAHAN)
-
 import React from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';

@@ -1,13 +1,11 @@
-// backend/controllers/trashController.js
-const Trash = require('../models/Trash'); // Asumsikan Anda memiliki model Trash
-const User = require('../models/User'); // Import model-model lain yang mungkin direstore
+const Trash = require('../models/Trash'); 
+const User = require('../models/User'); 
 const Donation = require('../models/Donation');
 const Transaction = require('../models/Transaction');
 const AidRecipient = require('../models/AidRecipient');
 const Aid = require('../models/Aid');
 const AidCategory = require('../models/AidCategory');
 
-// Fungsi untuk mendapatkan semua item di trash
 exports.getAllTrash = async (req, res) => {
   try {
     const trashItems = await Trash.find({});
@@ -18,11 +16,9 @@ exports.getAllTrash = async (req, res) => {
   }
 };
 
-// Fungsi untuk merestore item
 exports.restoreItem = async (req, res) => {
-  const { collection, documentId } = req.params; // Ambil collection dan documentId dari URL params
+  const { collection, documentId } = req.params; 
   try {
-    // 1. Temukan item di koleksi Trash berdasarkan collection dan documentId asli
     const trashRecord = await Trash.findOne({ collection, documentId });
     if (!trashRecord) {
       return res.status(404).json({ message: 'Item not found in trash.' });
@@ -40,35 +36,28 @@ exports.restoreItem = async (req, res) => {
       default: return res.status(400).json({ message: 'Unsupported collection type for restore.' });
     }
 
-    // 3. Masukkan kembali data asli (originalData) ke koleksi aslinya
-    // Pastikan originalData ada
     if (!trashRecord.originalData) {
        return res.status(400).json({ message: 'Original data missing for restore.' });
     }
 
-    // Clone originalData untuk menghindari modifikasi langsung pada Mongoose document jika itu kasusnya
-    // Dan hapus _id serta __v agar MongoDB bisa membuat _id baru atau menghindari konflik
     const dataToRestore = { ...trashRecord.originalData._doc || trashRecord.originalData };
     delete dataToRestore._id;
     delete dataToRestore.__v;
-    delete dataToRestore.isDeleted; // Pastikan isDeleted diset false jika ada
-    delete dataToRestore.deletedAt; // Pastikan deletedAt dihilangkan
+    delete dataToRestore.isDeleted; 
+    delete dataToRestore.deletedAt; 
 
-    // Cek apakah dokumen asli sudah ada (misalnya jika hanya isDeleted yang diubah)
-    // Jika dokumen asli ada, kita bisa mengupdatenya daripada membuat yang baru
     let restoredDoc;
-    // Asumsi: documentId di trash mengacu pada _id asli dokumen yang dihapus
+
     const existingOriginalDoc = await OriginalModel.findById(documentId);
 
     if (existingOriginalDoc) {
-      // Jika dokumen asli masih ada (misalnya cuma di-soft delete), update statusnya
-      // Hapus properti _id dari dataToRestore jika ada, agar tidak mencoba mengubah _id dokumen yang ada
+
       if (dataToRestore._id) delete dataToRestore._id;
-      // Gunakan updateOne atau findByIdAndUpdate tergantung kebutuhan
+
       await OriginalModel.findByIdAndUpdate(documentId, { ...dataToRestore, isDeleted: false, deletedAt: null }, { new: true });
-      restoredDoc = existingOriginalDoc; // Atau fetch kembali yang sudah diupdate
+      restoredDoc = existingOriginalDoc; 
     } else {
-      // Jika dokumen asli tidak ada di koleksi aslinya, buat yang baru
+
       restoredDoc = await OriginalModel.create(dataToRestore);
     }
 
@@ -83,11 +72,9 @@ exports.restoreItem = async (req, res) => {
 };
 
 
-// Fungsi untuk menghapus item secara permanen dari trash
 exports.permanentDeleteItem = async (req, res) => {
   const { collection, documentId } = req.params; // Ambil collection dan documentId dari URL params
   try {
-    // Hapus item dari koleksi Trash
     const result = await Trash.deleteOne({ collection, documentId });
 
     if (result.deletedCount === 0) {

@@ -15,8 +15,6 @@ app.use(express.json());
 
 console.log('[DEBUG 3] Middleware configured');
 
-// Panggil connectDB. Pastikan connectDB() tidak langsung exit jika gagal.
-// Idealnya, connectDB() harus menangani error koneksi dan tidak menyebabkan proses keluar.
 connectDB();
 
 mongoose.connection.on('connected', () => {
@@ -71,5 +69,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 }).on('error', (err) => {
     console.error(`[DEBUG SERVER ERROR] Failed to start server on port ${PORT}: ${err.message}`);
-    process.exit(1); // Keluar jika ada error pada listen
+    process.exit(1); 
 });

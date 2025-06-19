@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-// Pastikan bcrypt juga di-require jika Anda menggunakannya untuk hashing password
-// const bcrypt = require('bcryptjs'); // Jika Anda memiliki pre-save hook untuk hashing
+
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -8,7 +7,7 @@ const userSchema = new mongoose.Schema({
   password: { 
     type: String, 
     required: true,
-    select: false // <--- TAMBAHKAN BARIS INI
+    select: false 
   },
   role: { 
     type: String, 
@@ -28,14 +27,5 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Jika Anda memiliki pre-save hook untuk hashing password, pastikan juga di sini
-// userSchema.pre('save', async function(next) {
-//   if (this.isModified('password')) {
-//     const salt = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(this.password, salt);
-//   }
-//   next();
-// });
 
 module.exports = mongoose.model('User', userSchema);

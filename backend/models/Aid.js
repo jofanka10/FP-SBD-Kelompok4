@@ -1,5 +1,3 @@
-// File: backend/models/Aid.js
-
 const mongoose = require('mongoose');
 
 const aidSchema = new mongoose.Schema({
@@ -20,7 +18,7 @@ const aidSchema = new mongoose.Schema({
   },
   aid_category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'AidCategory', // Pastikan Anda punya model AidCategory.js
+    ref: 'AidCategory', 
     required: [true, 'Kategori bantuan wajib diisi']
   },
   isDeleted: {
@@ -32,7 +30,7 @@ const aidSchema = new mongoose.Schema({
     default: null
   }
 }, {
-  timestamps: true // Ini akan menambahkan createdAt dan updatedAt secara otomatis
+  timestamps: true 
 });
 
 module.exports = mongoose.model('Aid', aidSchema);
