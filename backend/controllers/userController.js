@@ -49,6 +49,7 @@ exports.createUser = async (req, res) => {
 
     const savedUser = await newUser.save();
     console.log("[BACKEND] User created:", savedUser);
+    
     res.status(201).json(savedUser);
   } catch (err) {
     console.error(`[BACKEND ERROR] Error in createUser: ${err.message}`);
@@ -63,21 +64,27 @@ exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, phone_number, address, account_status, role } = req.body;
   try {
+    const oldUser = await User.findById(id);
+    if (!oldUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const updateFields = { name, email, phone_number, address, account_status, role };
 
     if (password && password.trim() !== '') {
       updateFields.password = await bcrypt.hash(password, 10);
     }
 
-    const user = await User.findByIdAndUpdate(id, updateFields, { 
-      new: true, 
-      runValidators: true 
+    const user = await User.findByIdAndUpdate(id, updateFields, {
+      new: true,
+      runValidators: true
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     console.log("[BACKEND] User updated:", user);
+
     res.json(user);
   } catch (err) {
     console.error(`[BACKEND ERROR] Error in updateUser: ${err.message}`);

@@ -10,7 +10,8 @@ import {
   Trash2, 
   LayoutDashboard, 
   Menu, 
-  X 
+  X,
+  FileText 
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -29,11 +30,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Aid', href: '/aid', icon: Gift },
     { name: 'Aid Categories', href: '/aid-categories', icon: Tag },
     { name: 'Trash', href: '/trash', icon: Trash2 },
+    { name: 'Generate Reports', href: '/generate-reports', icon: FileText },
   ];
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 z-40 bg-black bg-opacity-25 lg:hidden"
@@ -41,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* Sidebar */}
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -79,9 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Top bar */}
         <div className="bg-white shadow-sm border-b border-gray-200 lg:hidden">
           <div className="flex items-center justify-between h-16 px-4">
             <button
@@ -95,7 +93,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* Page content */}
         <main className="flex-1 overflow-auto p-6">
           {children}
         </main>

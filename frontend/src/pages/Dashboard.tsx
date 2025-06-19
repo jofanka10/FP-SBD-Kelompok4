@@ -144,70 +144,7 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-100 rounded-full p-2">
-                  <Heart className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">New donation received</p>
-                  <p className="text-sm text-gray-500">2 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 rounded-full p-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">New user registered</p>
-                  <p className="text-sm text-gray-500">5 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="bg-purple-100 rounded-full p-2">
-                  <CreditCard className="h-4 w-4 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Transaction completed</p>
-                  <p className="text-sm text-gray-500">10 minutes ago</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <Users className="h-8 w-8 text-blue-600 mb-2" />
-                <span className="text-sm font-medium text-gray-900">Add User</span>
-              </button>
-              <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <Heart className="h-8 w-8 text-green-600 mb-2" />
-                <span className="text-sm font-medium text-gray-900">New Donation</span>
-              </button>
-              <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <UserCheck className="h-8 w-8 text-orange-600 mb-2" />
-                <span className="text-sm font-medium text-gray-900">Add Recipient</span>
-              </button>
-              <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <CreditCard className="h-8 w-8 text-purple-600 mb-2" />
-                <span className="text-sm font-medium text-gray-900">View Reports</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import AidRecipients from './pages/AidRecipients';
 import Aid from './pages/Aid';
 import AidCategories from './pages/AidCategories';
 import Trash from './pages/Trash';
+import ReportGenerator from './pages/ReportGenerator';
 import { ToastProvider } from './contexts/ToastContext';
 import Toast from './components/Toast';
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="/aid" element={<Aid />} />
               <Route path="/aid-categories" element={<AidCategories />} />
               <Route path="/trash" element={<Trash />} />
+              <Route path="/generate-reports" element={<ReportGenerator />} />
             </Routes>
           </Layout>
           <Toast />
