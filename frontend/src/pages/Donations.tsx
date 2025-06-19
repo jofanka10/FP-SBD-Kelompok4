@@ -1,3 +1,5 @@
+// frontend/src/pages/Donations.tsx
+
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
 import { donationAPI, userAPI } from '../services/api';
@@ -41,6 +43,7 @@ const Donations: React.FC = () => {
       setDonations(donationsRes.data);
       setUsers(usersRes.data);
     } catch (error) {
+      console.error("Frontend Error fetching data:", error); // Lebih detail
       addToast('Error fetching data', 'error');
     } finally {
       setLoading(false);
@@ -54,6 +57,7 @@ const Donations: React.FC = () => {
         addToast('Donation moved to trash successfully', 'success');
         fetchData();
       } catch (error) {
+        console.error("Frontend Error deleting donation:", error); // Lebih detail
         addToast('Error deleting donation', 'error');
       }
     }
@@ -80,15 +84,18 @@ const Donations: React.FC = () => {
   const handleModalSubmit = async (donationData: any) => {
     try {
       if (modalMode === 'create') {
+        console.log("Frontend: Sending new donation data to backend:", donationData); // Log data yang dikirim
         await donationAPI.create(donationData);
         addToast('Donation created successfully', 'success');
       } else if (modalMode === 'edit') {
+        console.log("Frontend: Sending update donation data to backend:", donationData); // Log data yang dikirim
         await donationAPI.update(selectedDonation!._id, donationData);
         addToast('Donation updated successfully', 'success');
       }
       setIsModalOpen(false);
-      fetchData();
+      fetchData(); // Muat ulang data setelah sukses
     } catch (error) {
+      console.error(`Frontend Error ${modalMode === 'create' ? 'creating' : 'updating'} donation:`, error); // Lebih detail
       addToast(`Error ${modalMode === 'create' ? 'creating' : 'updating'} donation`, 'error');
     }
   };

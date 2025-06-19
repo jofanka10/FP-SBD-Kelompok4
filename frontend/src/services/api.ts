@@ -1,15 +1,11 @@
 // frontend/src/services/api.ts
+
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-if (!API_BASE_URL) {
-  console.error("Kesalahan Konfigurasi: VITE_API_BASE_URL tidak terdefinisi di frontend/.env");
-}
-
 const API = axios.create({
-  // baseURL akan menjadi "http://localhost:5001/api"
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: `${API_BASE_URL || 'http://localhost:5000'}/api`, // Tambahkan default fallback jika tidak terdefinisi
   headers: {
     'Content-Type': 'application/json',
   },
@@ -60,14 +56,11 @@ export const aidAPI = {
   getById: (id: string) => API.get(`/aids/${id}`),
   create: (data: any) => API.post('/aids', data),
   update: (id: string, data: any) => API.put(`/aids/${id}`, data),
-  delete: (id: string) => API.delete(`/aids/${id}`),
+  delete: (id: string) => API.delete('/aids', data),
 };
 
-// Deklarasi trashAPI yang benar dan menggunakan Axios
 export const trashAPI = {
-  getAll: () => API.get('/trash'), // Untuk mendapatkan semua item di trash
-  // Fungsi restore dan permanentDelete di Trash.tsx menerima (collection, documentId)
-  // URL ini sekarang cocok dengan rute backend yang diperbarui
+  getAll: () => API.get('/trash'),
   restore: (collection: string, documentId: string) => API.put(`/trash/restore/${collection}/${documentId}`),
   permanentDelete: (collection: string, documentId: string) => API.delete(`/trash/permanent-delete/${collection}/${documentId}`),
 };
